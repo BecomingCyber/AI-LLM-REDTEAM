@@ -1,0 +1,8 @@
+Flask
+openai
+python-dotenv
+requests
+pydantic
+Jinja2
+reportlab
+pytest

@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>AI LLM Red-Team Security Tester</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body>
+    <header class="hero">
+      <div class="container">
+        <p class="eyebrow">Authorized AI Security Testing</p>
+
+        <h1>AI LLM Red-Team Security Tester</h1>
+
+        <p class="subtitle">
+          Assess LLM resistance to prompt injection, instruction conflicts,
+          system prompt extraction, jailbreak attempts, and sensitive
+          information leakage.
+        </p>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <div class="container">
+        <div class="section-title">
+          <h2>Target Configuration</h2>
+
+          <p>Current environment and configured red-team test suite.</p>
+        </div>
+
+        <section class="config-grid">
+          <div class="card">
+            <p class="card-label">Target Mode</p>
+
+            <p class="card-value">
+              <span class="status-dot"></span>
+              {{ target_mode|upper }}
+            </p>
+          </div>
+
+          <div class="card">
+            <p class="card-label">Target Model</p>
+
+            <p class="card-value">{{ target_model }}</p>
+          </div>
+
+          <div class="card">
+            <p class="card-label">Configured Tests</p>
+
+            <p class="card-value">{{ test_cases|length }}</p>
+          </div>
+        </section>
+
+        <section class="assessment-action">
+          <div>
+            <h2>Security Assessment</h2>
+
+            <p>
+              Execute all configured tests against the authorized target and
+              evaluate the captured responses.
+            </p>
+          </div>
+
+          <div class="action-buttons">
+            <form action="{{ url_for('run_assessment') }}" method="POST">
+              <button class="run-button" type="submit">
+                Run Security Assessment
+              </button>
+            </form>
+
+            {% if results %}
+
+            <a class="download-button" href="{{ url_for('download_report') }}">
+              Download PDF Report
+            </a>
+
+            {% endif %}
+          </div>
+        </section>
+
+        {% if summary %}
+
+        <div class="section-title">
+          <h2>Assessment Summary</h2>
+
+          <p>Results from the most recent security assessment.</p>
+        </div>
+
+        <section class="summary-grid">
+          <div class="card">
+            <p class="card-label">Total Tests</p>
+
+            <p class="card-value">{{ summary.total }}</p>
+          </div>
+
+          <div class="card">
+            <p class="card-label">Passed</p>
+
+            <p class="card-value success-text">{{ summary.passed }}</p>
+          </div>
+
+          <div class="card">
+            <p class="card-label">Failed</p>
+
+            <p class="card-value danger-text">{{ summary.failed }}</p>
+          </div>
+
+          <div class="card">
+            <p class="card-label">Highest Risk</p>
+
+            <p class="card-value">{{ summary.highest_risk }}</p>
+          </div>
+        </section>
+
+        {% endif %}
+
+        <div class="section-title">
+          <h2>
+            {% if results %} Assessment Results {% else %} Security Test Suite
+            {% endif %}
+          </h2>
+
+          <p>
+            {% if results %} Captured responses and security evaluation results.
+            {% else %} Configured adversarial tests ready for authorized
+            execution. {% endif %}
+          </p>
+        </div>
+
+        <section class="table-card">
+          {% if results %}
+
+          <table>
+            <thead>
+              <tr>
+                <th>Test ID</th>
+                <th>Category</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Risk</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for result in results %}
+
+              <tr>
+                <td class="test-id">{{ result.test_id }}</td>
+
+                <td>{{ result.category }}</td>
+
+                <td>
+                  <span
+                    class="badge {% if result.severity == 'critical' %} badge-critical {% else %} badge-high {% endif %}"
+                  >
+                    {{ result.severity }}
+                  </span>
+                </td>
+
+                <td>
+                  <span
+                    class="result-badge {% if result.status == 'PASS' %} result-pass {% elif result.status == 'FAIL' %} result-fail {% else %} result-unknown {% endif %}"
+                  >
+                    {{ result.status }}
+                  </span>
+                </td>
+
+                <td>{{ result.risk_score }}</td>
+              </tr>
+
+              <tr class="evidence-row">
+                <td colspan="5">
+                  <div class="evidence">
+                    <p class="evidence-label">Attack Prompt</p>
+
+                    <p>{{ result.prompt }}</p>
+
+                    <p class="evidence-label">Target Response</p>
+
+                    <p>{{ result.response }}</p>
+
+                    <p class="evidence-label">Evaluation</p>
+
+                    <p>{{ result.reason }}</p>
+                  </div>
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+
+          {% else %}
+
+          <table>
+            <thead>
+              <tr>
+                <th>Test ID</th>
+                <th>Category</th>
+                <th>Test Name</th>
+                <th>Severity</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for test in test_cases %}
+
+              <tr>
+                <td class="test-id">{{ test.id }}</td>
+
+                <td>{{ test.category }}</td>
+
+                <td>{{ test.name }}</td>
+
+                <td>
+                  <span
+                    class="badge {% if test.severity == 'critical' %} badge-critical {% else %} badge-high {% endif %}"
+                  >
+                    {{ test.severity }}
+                  </span>
+                </td>
+              </tr>
+
+              {% endfor %}
+            </tbody>
+          </table>
+
+          {% endif %}
+        </section>
+
+        <p class="footer-note">
+          Dashboard views do not execute tests automatically. API requests occur
+          only when an assessment is explicitly initiated. A PASS indicates that
+          the configured failure condition was not observed; it does not
+          establish that the target is secure against all possible attacks.
+        </p>
+      </div>
+    </main>
+  </body>
+</html>
