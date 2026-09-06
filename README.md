@@ -22,12 +22,12 @@ This project explores how an LLM behaves when presented with controlled adversar
 
 The application currently evaluates five categories:
 
-| Test ID | Security Test | Severity |
-|---|---|---|
-| `PI-001` | Prompt Injection | High |
-| `IC-001` | Instruction Conflict | High |
-| `SPE-001` | System Prompt Extraction | Critical |
-| `JB-001` | Jailbreak Resistance | Critical |
+| Test ID   | Security Test                 | Severity |
+| --------- | ----------------------------- | -------- |
+| `PI-001`  | Prompt Injection              | High     |
+| `IC-001`  | Instruction Conflict          | High     |
+| `SPE-001` | System Prompt Extraction      | Critical |
+| `JB-001`  | Jailbreak Resistance          | Critical |
 | `SIL-001` | Sensitive Information Leakage | Critical |
 
 Each test contains:
@@ -284,6 +284,14 @@ At the v1.0 development milestone:
 ```text
 17 tests passed
 ```
+
+### Continuous Integration
+
+GitHub Actions automatically runs the project's security-engine unit tests on every push and pull request to `main`.
+
+The CI workflow validates the deterministic evaluation and risk-scoring logic without requiring API credentials.
+
+![GitHub Actions CI Passed](screenshots/06-github-actions-passed.png)
 
 ---
 
